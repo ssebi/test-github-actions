@@ -22,16 +22,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        
-      - name: Install Dependencies
-        run: |
-          pod install --repo-update
 
       - name: Cache CocoaPods
+        id: cache-pods
         uses: actions/cache@v2
         with:
           path: Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('Podfile.lock') }}
+
+      - if: ${{ steps.cache-pods.outputs.cache-hit != 'true' }}
+        name: List the state of Pods
+        continue-on-error: true
+        run: echo "Cache hit missed, installing dependencies..."
+
+      - name: Install Dependencies
+        run: |
+          pod install --repo-update
 
       - name: Build and test
         run: |
