@@ -1,0 +1,44 @@
+# This workflow will build a Swift project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-swift
+
+name: 🚀 Xcode - Build and Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+    types: [opened, reopened, edited, synchronize]
+    
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build and test the CI scheme using xcodebuild command
+    runs-on: macos-latest
+    
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: Install Dependencies
+        run: |
+          pod install --repo-update
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v2
+        with:
+          path: Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('Podfile.lock') }}
+
+      - name: Build and test
+        run: |
+          xcodebuild \
+            build-for-testing \
+            -workspace Mindless.xcworkspace \
+            -scheme CI \
+            -destination 'platform=iOS Simulator,name=iPhone 14,OS=16.2' \
+            test-without-building |
+            xcpretty
