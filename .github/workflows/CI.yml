@@ -29,13 +29,17 @@ jobs:
         with:
           path: Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
 
       - if: ${{ steps.cache-pods.outputs.cache-hit != 'true' }}
         name: Install cocoapods
         continue-on-error: true
         run: | 
-          echo "Cache hit missed, installing dependencies..." |
-          pod install --repo-update
+          echo "Cache hit missed, installing dependencies..."
+
+      - name: CocoaPod Install
+        run: pod install
 
       - name: Build and test
         run: |
