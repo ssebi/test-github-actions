@@ -31,12 +31,10 @@ jobs:
           key: ${{ runner.os }}-pods-${{ hashFiles('Podfile.lock') }}
 
       - if: ${{ steps.cache-pods.outputs.cache-hit != 'true' }}
-        name: List the state of Cache
+        name: Install cocoapods
         continue-on-error: true
-        run: echo "Cache hit missed, installing dependencies..."
-
-      - name: Install Dependencies
-        run: |
+        run: | 
+          echo "Cache hit missed, installing dependencies..." |
           pod install --repo-update
 
       - name: Build and test
