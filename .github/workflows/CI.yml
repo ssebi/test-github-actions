@@ -16,6 +16,9 @@ jobs:
   build-and-test:
     name: Build and test the CI scheme using xcodebuild command
     runs-on: macos-latest
+    strategy:
+      matrix:
+        destination: ['platform=iOS Simulator,name=iPhone 14,OS=16.2']
     
     timeout-minutes: 45
 
@@ -47,6 +50,8 @@ jobs:
             build-for-testing \
             -workspace TestApp.xcworkspace \
             -scheme CI \
-            -destination 'platform=iOS Simulator,name=iPhone 14,OS=16.2' \
+            -destination "${destination}" \
             test-without-building |
             xcpretty
+    env:
+      destination: ${{ matrix.destination }}
